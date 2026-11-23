@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MarkdownSettings">
+    <option name="customStylesheetText" value="body {&#10;  font-family: &quot;Segoe UI&quot;, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;&#10;  font-size: 16px;&#10;  line-height: 1.5;&#10;}&#10;&#10;h1, h2, h3, h4, h5, h6 {&#10;  font-family: &quot;Segoe UI&quot;, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;&#10;  font-weight: 700;&#10;}&#10;&#10;code, pre {&#10;  font-family: ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, monospace;&#10;}" />
+    <option name="useCustomStylesheetText" value="true" />
+  </component>
+</project>
