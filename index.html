@@ -11,7 +11,6 @@
       50% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.3); border-color: rgba(52, 211, 153, 0.35); }
     }
     .ultra-glass {
-      /* Dropped the opacity and green tint slightly for a deeper, darker tile look while retaining the glass essence */
       background: linear-gradient(180deg, rgba(2, 28, 19, 0.65) 0%, rgba(5, 8, 6, 0.99) 100%);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -48,16 +47,16 @@
         <div class="space-y-4">
           <div class="flex justify-between items-baseline">
             <span class="text-xs text-zinc-500">Main Battery</span>
-            <span class="font-mono text-xl text-emerald-400/90 font-bold tracking-tight">13.8V</span>
+            <span id="voltage-val" class="font-mono text-xl text-emerald-400/90 font-bold tracking-tight">13.8V</span>
           </div>
           <div class="w-full bg-black rounded-full h-1.5 overflow-hidden border border-zinc-900">
-            <div class="bg-emerald-600 h-full rounded-full shadow-[0_0_6px_rgba(16,185,129,0.4)]" style="width: 85%"></div>
+            <div id="voltage-bar" class="bg-emerald-600 h-full rounded-full shadow-[0_0_6px_rgba(16,185,129,0.4)]" style="width: 85%"></div>
           </div>
           
           <div class="pt-2 grid grid-cols-2 gap-3">
             <div class="bg-black/40 p-3 rounded-xl border border-zinc-900 text-center">
               <span class="text-[10px] uppercase text-zinc-600 block mb-1">Ping</span>
-              <span class="font-mono text-sm font-semibold text-zinc-300">4 ms</span>
+              <span id="ping-val" class="font-mono text-sm font-semibold text-zinc-300">4 ms</span>
             </div>
             <div class="bg-black/40 p-3 rounded-xl border border-zinc-900 text-center">
               <span class="text-[10px] uppercase text-zinc-600 block mb-1">Wi-Fi Ch</span>
@@ -70,7 +69,10 @@
       <div class="ultra-glass p-6 rounded-2xl">
         <h2 class="text-xs font-bold uppercase tracking-wider border-b border-zinc-900 pb-2 mb-4 text-zinc-500">Robot Status</h2>
         <div class="space-y-2 font-mono text-xs">
-          <div class="flex justify-between p-2 rounded bg-black/40 border border-zinc-900/30"><span class="text-zinc-500">OpMode:</span><span class="text-amber-500/80 font-semibold">TELEOP_ACTIVE</span></div>
+          <div class="flex justify-between p-2 rounded bg-black/40 border border-zinc-900/30">
+            <span class="text-zinc-500">OpMode:</span>
+            <span id="opmode-val" class="text-amber-500/80 font-semibold">TELEOP_ACTIVE</span>
+          </div>
           <div class="flex justify-between p-2 rounded bg-black/40 border border-zinc-900/30"><span class="text-zinc-500">Warnings:</span><span class="text-zinc-300">0</span></div>
           <div class="flex justify-between p-2 rounded bg-black/40 border border-zinc-900/30"><span class="text-zinc-500">Hub Layout:</span><span class="text-zinc-300">Parent + Child</span></div>
         </div>
@@ -143,5 +145,38 @@
 
     </section>
   </main>
+
+  <!-- Live Telemetry Update Script -->
+  <script>
+    async function fetchTelemetry() {
+      try {
+        let response = await fetch('/telemetry');
+        if (!response.ok) return;
+        let data = await response.json();
+        
+        // Update Voltage Text & Bar Width (assuming scale 10V - 14V)
+        if (data.voltage !== undefined) {
+          document.getElementById('voltage-val').innerText = data.voltage.toFixed(1) + 'V';
+          let percentage = Math.min(Math.max((data.voltage - 10.0) / 4.0 * 100, 0), 100);
+          document.getElementById('voltage-bar').style.width = percentage + '%';
+        }
+        
+        // Update Ping
+        if (data.ping !== undefined) {
+          document.getElementById('ping-val').innerText = data.ping + ' ms';
+        }
+        
+        // Update OpMode Status
+        if (data.opmode !== undefined) {
+          document.getElementById('opmode-val').innerText = data.opmode;
+        }
+      } catch (e) {
+        console.error("Telemetry update error:", e);
+      }
+    }
+
+    // Poll every 1000ms (1 second)
+    setInterval(fetchTelemetry, 1000);
+  </script>
 </body>
 </html>
